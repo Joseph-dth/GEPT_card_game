@@ -593,6 +593,11 @@
                 <p>單字 41-60</p>
                 <small>acquire ~ administration</small>
             </div>
+            <div class="level-card" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);" onclick="selectLevel(3)">
+                <h3>🎯 0831 測驗</h3>
+                <p>隨機抽選 20 題</p>
+                <small>從全部 60 個單字中隨機選取</small>
+            </div>
         </div>
 
         <!-- 單字列表 -->
@@ -775,17 +780,27 @@
             document.getElementById('wordList').style.display = 'block';
             document.querySelector('.back-btn').classList.remove('hidden');
             
-            const levelTitles = ['第一關', '第二關', '第三關'];
-            const ranges = ['1-20', '21-40', '41-60'];
+            const levelTitles = ['第一關', '第二關', '第三關', '0831 測驗'];
+            const ranges = ['1-20', '21-40', '41-60', '隨機 20 題'];
             
             document.getElementById('levelTitle').textContent = `${levelTitles[selectedLevel]} 單字列表 (${ranges[selectedLevel]})`;
-            document.getElementById('wordCount').textContent = `共20個單字`;
             
             // 顯示單字網格
             const wordGrid = document.getElementById('wordGrid');
             wordGrid.innerHTML = '';
             
-            gameData[selectedLevel].forEach(item => {
+            let wordsToShow;
+            if (selectedLevel === 3) {
+                // 0831 測驗：從所有關卡中隨機選取20個單字
+                const allWords = gameData.flat();
+                wordsToShow = [...allWords].sort(() => Math.random() - 0.5).slice(0, 20);
+                document.getElementById('wordCount').textContent = `隨機抽選20個單字`;
+            } else {
+                wordsToShow = gameData[selectedLevel];
+                document.getElementById('wordCount').textContent = `共20個單字`;
+            }
+            
+            wordsToShow.forEach(item => {
                 const wordItem = document.createElement('div');
                 wordItem.className = 'word-item';
                 wordItem.innerHTML = `
@@ -809,10 +824,18 @@
             wrongCount = 0;
             
             // 設定問題順序
-            currentQuestions = [...gameData[selectedLevel]].sort(() => Math.random() - 0.5);
+            if (selectedLevel === 3) {
+                // 0831 測驗：從所有關卡中隨機選取20個單字
+                const allWords = gameData.flat();
+                const randomWords = [...allWords].sort(() => Math.random() - 0.5).slice(0, 20);
+                currentQuestions = randomWords;
+            } else {
+                currentQuestions = [...gameData[selectedLevel]].sort(() => Math.random() - 0.5);
+            }
             
             // 更新UI
-            document.getElementById('currentLevel').textContent = selectedLevel + 1;
+            const levelNames = ['第一關', '第二關', '第三關', '0831 測驗'];
+            document.getElementById('currentLevel').textContent = levelNames[selectedLevel];
             document.getElementById('currentMode').textContent = mode === 'en-to-zh' ? '英翻中' : '中翻英';
             
             startQuestion();
